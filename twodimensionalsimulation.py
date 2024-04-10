@@ -1,7 +1,9 @@
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
 from matplotlib import pyplot as plt
-import numpy as np
 import math
-import tensorflow as tf
+import numpy as np
 
 #functions and equations for uniform circular motion
 
@@ -51,17 +53,15 @@ def position_in_1_dimension(initial_position, initial_vel, time, acceleration):
 def normalize_vector(vector):
     return vector/np.linalg.norm
 
-
-
 class projectile():
-    def __init__(self):
-        self.tang_force = 4
-        self.time_to_release = 15
+    def __init__(self, time_to_release):
+        self.tang_force = 0.01
+        self.time_to_release = time_to_release
         self.time_increments = 0.25
         self.steps = int(self.time_to_release/self.time_increments)
         self.ang_vel = 0
-        self.radius = 20
-        self.mass = 4
+        self.radius = 15
+        self.mass = 20
         self.coordinates = np.transpose(np.atleast_2d(np.array([0, self.radius])))
         self.tangential_velocity = 0
         self.current_angular_acceleration = 0
@@ -75,6 +75,8 @@ class projectile():
         self.x_position_post_release = 0
         self.y_position_post_release = 0
         self.gravitational_constant_accel = -6.67430
+        self.range_target_forgiveness = 3
+        self.post_release_results_from_experiment = 0
 
 
     #instead of rewriting the entire thing, I can just vectorize this angular momentum in 3-dimensions.
@@ -97,14 +99,13 @@ class projectile():
         return [self.projectile_x_axis_position(), self.projectile_y_axis_position()]
 
     def projectile_x_axis_position(self):
-        self.x_position_post_release = position_in_1_dimension(self.x_position_post_release,self.overall_velocity_vector_x,self.time_to_release,0)
+        self.x_position_post_release = position_in_1_dimension(self.x_position_post_release,self.overall_velocity_vector_x,self.time_increments,0)
 
         return self.x_position_post_release
 
     def projectile_y_axis_position(self):
         self.y_position_post_release = position_in_1_dimension(self.y_position_post_release,self.overall_velocity_vector_y,self.time_increments, self.gravitational_constant_accel)
         self.overall_velocity_vector_y = final_velocity(self.overall_velocity_vector_y, self.gravitational_constant_accel,self.time_increments)
-        print(self.y_position_post_release)
 
         return self.y_position_post_release
 
@@ -114,10 +115,20 @@ class projectile():
     #positive angular velocity indicates counterclockwise motion
     def calculate_tangential_velocity_at_sphere_point(self):
         angular_vel_vector = np.array([0,0,self.current_angular_velocity])
-        three_dimcoordin_radius = np.array([self.coordinates[0][0],self.coordinates[1][0], 0])
+        three_dimcoordin_radius = np.array([self.coordinates[0][0], self.coordinates[1][0], 0])
         tangential_velocity = np.cross(three_dimcoordin_radius, angular_vel_vector)
         return np.delete(tangential_velocity,2)
 
+    def target_simulator(self,range):
+        Array = []
+        while len(Array) < 2:
+            x = np.random.randint(low=-40, high=range)
+            if x < (-1*self.radius) or x > (self.radius):
+                Array += [x]
+        return Array
+
+
+    #Need to adjust the simulation to give the correct output, or write another method to do the job.
     def simulation(self):
         Array_positionx = []
         Array_positiony = []
@@ -166,22 +177,75 @@ class projectile():
         v = Array_overall_tan_vely
         ax1.quiver(X,Y,u,v)
         plt.show()
-        plt.scatter(Array_positionx,Array_positiony)
+        Array_positionx1 = Array_positionx + [[300]]
+        Array_positiony1 = Array_positiony + [[400]]
+        plt.scatter(Array_positionx1,Array_positiony1)
         plt.show()
 
+        return [X,Y]
 
-        #plt.scatter(Array_x1, Array_y1)
-        #plt.scatter(Array_x2, Array_y2)
-        #plt.show()
-        #plt.scatter(Array_x3, Array_y3)
-        #plt.show()
+    def reinforcment_simulation(self):
+
+        Array_positionx = []
+        Array_positiony = []
+        Array_overall_tan_velx = []
+        Array_overall_tan_vely = []
+        for i in range(0, self.steps):
+            temporary = self.projectile_pre_release_routine()
+            Array_positionx += [temporary[0][0]]
+            Array_positiony += [temporary[0][1]]
+            Array_overall_tan_velx += [temporary[1][0]]
+            Array_overall_tan_vely += [temporary[1][1]]
+            self.x_position_post_release = temporary[0][0]
+            self.y_position_post_release = temporary[0][1]
+
+        X = Array_positionx
+        Y = Array_positiony
+        u = Array_overall_tan_velx
+        v = Array_overall_tan_vely
+
+        self.overall_velocity_vector_x = self.tangential_velocity[0]
+        self.overall_velocity_vector_y = self.tangential_velocity[1]
+
+        self.current_angular_velocity = 0
+
+        Array_positionx = [self.coordinates[0]]
+        Array_positiony = [self.coordinates[1]]
+        Array_overall_tan_velx = [self.overall_velocity_vector_x]
+        Array_overall_tan_vely = [self.overall_velocity_vector_y]
+            # continue simulation until the object hits the ground.
+        while self.y_position_post_release >= self.ground_level:
+            temporary = self.projectile_after_release()
+            Array_positionx += [temporary[0]]
+            Array_positiony += [temporary[1]]
+            Array_overall_tan_velx += [self.overall_velocity_vector_x]
+            Array_overall_tan_vely += [self.overall_velocity_vector_y]
+
+        X = Array_positionx
+        Y = Array_positiony
+
+        self.post_release_results_from_experiment = [X,Y]
+
+        return [X,Y]
+
+    def calculates_closest_distance(self, array_x, array_y, coordinates_of_target):
+        min = 0
+        for i in range(0, len(array_x)):
+            for j in range(0, len(array_y)):
+                if min <= math.sqrt((array_x[i]-coordinates_of_target[0])**2 + (array_y[j]-coordinates_of_target[1])**2):
+                    min = math.sqrt((array_x[i]-coordinates_of_target[0])**2 + (array_y[j]-coordinates_of_target[1])**2)
+        return min
+
+    def is_a_hit(self, min, forgiveness):
+        if min <= forgiveness:
+            return 1
+        else:
+            return 0
+
+    def loss_function(self,hit, min_distance, max_distance):
+        if hit == 1:
+            return 10
+        else:
+            return 10*-1*math.log(min_distance/max_distance,math.e)
 
 # Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-
-    vect = np.array([0,1])
-    vect = np.atleast_2d(vect)
-    vect = np.transpose(vect)
-    ball = projectile()
-    ball.simulation()
-    print("steve")
