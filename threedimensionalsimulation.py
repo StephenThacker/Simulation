@@ -177,7 +177,6 @@ class three_d_projectile():
             Array1_overall_tan_velx += [self.current_post_release_tang_vel_x]
             Array1_overall_tan_vely += [self.current_post_release_tang_vel_y]
             Array1_overall_tan_velz += [self.current_post_release_tang_vel_z]
-            print("steve")
 
         X1 = Array1_positionx
         Y1 = Array1_positiony
