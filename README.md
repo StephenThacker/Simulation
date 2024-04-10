@@ -1,5 +1,5 @@
 # Simulation
-Two dimensional and three dimensional physics based simulation of a projectile leaving a sling.
+Two dimensional and three dimensional physics based simulation of a projectile leaving a sling. Uses the kinematic equations for angular motion and standard motion.
   ![Figure1_prelaunch](https://github.com/StephenThacker/Simulation/assets/35053174/97e97a53-4e6a-43c6-b76a-7630747c7980) 
 Fig 1: Position and Velocities of Projectile Before Leaving Sling
 
@@ -7,7 +7,7 @@ Fig 1: Position and Velocities of Projectile Before Leaving Sling
 
 Fig 2: Positions and Velocities of Projectile After Leaving Sling
 
-In three dimensions, the projectile can be spun in any axis and simultaneously accounts for the angular motion in multiple orientations.
+In three dimensions, the projectile can be spun in any axis and simultaneously accounts for the tangential forces applied to the object in multiple orientations.
 
 ![image](https://github.com/StephenThacker/Simulation/assets/35053174/940b3e12-151c-4646-8d69-149945145b62)
 
