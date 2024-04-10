@@ -13,4 +13,4 @@ In three dimensions, the projectile can be spun in any axis and simultaneously a
 
 ![image](https://github.com/StephenThacker/Simulation/assets/35053174/4e0398d6-092f-43e2-9c3f-dddd219ebb3d) 
 
-Fig 3 and 4: Positions and Velocities of the Projectile In Three Dimensions.
+Fig 4: Positions and Velocities of the Projectile In Three Dimensions.
