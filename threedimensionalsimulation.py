@@ -1,5 +1,5 @@
 #Expands the simulation to occur in 3 dimensions.
-from tensorflowsimulation import *
+from twodimensionalsimulation import *
 import numpy as np
 import math
 
