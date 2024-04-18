@@ -1,5 +1,5 @@
 # Simulation
-Two dimensional and three dimensional physics based simulation of a projectile leaving a sling. Uses the kinematic equations for angular motion and standard motion.
+This github repository contains python code demonstrating two and three-dimensional, physics based simulations of a projectile leaving a sling. This model uses the kinematic equations to model the trajectory of a projectile rotating through the sling and then flying through space. In the three dimensional case, the projectile can be controlled with angular forces from multiple orientations, simultaneously. 
 
 ![image](https://github.com/StephenThacker/Simulation/assets/35053174/940b3e12-151c-4646-8d69-149945145b62)
 
